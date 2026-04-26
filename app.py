@@ -37,6 +37,7 @@ def inject_neon_css(bg_img_base64):
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700;900&family=Inter:wght@400;700;800&display=swap');
 
+        /* Global Theme */
         html, body, [class*="css"] {{
             font-family: 'Inter', sans-serif;
             background-color: #050505;
@@ -49,9 +50,12 @@ def inject_neon_css(bg_img_base64):
             background-size: cover;
         }}
 
+        /* Animations */
+        @keyframes neonPulse {{ 0%, 100% {{ box-shadow: 0 0 10px #00f5ff; }} 50% {{ box-shadow: 0 0 30px #00f5ff; }} }}
         @keyframes flicker {{ 0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {{ opacity: 1; text-shadow: 0 0 10px #ec4899; }} 20%, 22%, 24%, 55% {{ opacity: 0.5; text-shadow: none; }} }}
         @keyframes fadeInUp {{ from {{ opacity: 0; transform: translateY(30px); }} to {{ opacity: 1; transform: translateY(0); }} }}
 
+        /* UI Elements */
         .neon-logo {{
             font-family: 'Bangers', cursive;
             font-size: 8rem;
@@ -64,27 +68,71 @@ def inject_neon_css(bg_img_base64):
         }}
 
         .tagline {{
-            text-align: center; font-size: 1.5rem; color: #00f5ff; margin-bottom: 2rem; font-weight: 700; animation: fadeInUp 1s ease-out; letter-spacing: 2px;
+            text-align: center;
+            font-size: 1.5rem;
+            color: #00f5ff;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            animation: fadeInUp 1s ease-out;
+            letter-spacing: 2px;
         }}
 
         .login-card {{
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 30px; padding: 4rem; text-align: center; backdrop-filter: blur(25px); max-width: 600px; margin: 0 auto; animation: fadeInUp 0.8s ease-out; box-shadow: 0 0 40px rgba(0, 245, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 30px;
+            padding: 4rem;
+            text-align: center;
+            backdrop-filter: blur(25px);
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
+            box-shadow: 0 0 40px rgba(0, 245, 255, 0.1);
         }}
 
         .stButton>button {{
-            background: linear-gradient(45deg, #6200EE, #ec4899); color: white !important; border: none; padding: 1.2rem 3rem; border-radius: 15px; font-weight: 900; transition: all 0.3s ease; width: 100%; text-transform: uppercase; letter-spacing: 1px;
+            background: linear-gradient(45deg, #6200EE, #ec4899);
+            color: white !important;
+            border: none;
+            padding: 1.2rem 3rem;
+            border-radius: 15px;
+            font-weight: 900;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }}
 
         .stButton>button:hover {{ transform: scale(1.05); box-shadow: 0 0 30px #ec4899; }}
 
+        /* Navbar */
         .navbar {{
-            display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background: rgba(0, 0, 0, 0.85); border-bottom: 2px solid #ec4899; backdrop-filter: blur(20px); position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: rgba(0, 0, 0, 0.85);
+            border-bottom: 2px solid #ec4899;
+            backdrop-filter: blur(20px);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
         }}
 
-        .nav-logo-text {{ font-family: 'Bangers', cursive; color: #ec4899; font-weight: 400; font-size: 2.5rem; letter-spacing: 2px; }}
+        .nav-logo-text {{
+            font-family: 'Bangers', cursive;
+            color: #ec4899;
+            font-weight: 400;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+        }}
 
         [data-testid="stSidebar"] {{ display: none; }}
         [data-testid="stSidebarNav"] {{ display: none; }}
+
+        /* Mobile */
+        @media (max-width: 768px) {{
+            .neon-logo {{ font-size: 4rem; letter-spacing: 2px; }}
+            .tagline {{ font-size: 1rem; }}
+        }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -92,18 +140,23 @@ def main():
     bg_img = get_base64_of_bin_file("assets/slize_hero.png")
     inject_neon_css(bg_img)
 
-    # --- ROBUST AUTH CHECK ---
+    # --- ROBUST AUTH DETECTION ---
     if "auth" not in st.secrets:
         st.error("⚠️ Authentication Configuration Missing")
-        st.info("Please add `[auth]` and `[auth.google]` to your Streamlit Secrets.")
+        st.info("Ensure you have added `[auth]` and `[auth.google]` to your Streamlit Secrets.")
         st.stop()
 
+    # Get login status
     is_logged_in = False
     try:
-        is_logged_in = st.user.get("is_logged_in", False)
+        # Direct property access is often more reliable in Streamlit 1.56.0
+        is_logged_in = st.user.is_logged_in
     except Exception:
-        if hasattr(st.user, "is_logged_in"):
-            is_logged_in = st.user.is_logged_in
+        # Fallback to .get() if available
+        try:
+            is_logged_in = st.user.get("is_logged_in", False)
+        except:
+            is_logged_in = False
 
     if not is_logged_in:
         # FULL SCREEN LOGIN
@@ -119,8 +172,8 @@ def main():
                 try:
                     st.login("google")
                 except Exception as e:
-                    st.error(f"Authentication Error: {str(e)}")
-                    st.warning("Ensure your Redirect URI in Google Console matches your Streamlit Secrets.")
+                    st.error(f"Failed to initiate login: {str(e)}")
+                    st.info("Check your 'Redirect URI' in Google Console.")
             st.markdown("<p style='margin-top: 2rem; opacity: 0.6; font-size: 0.9rem;'>Free • No Watermark • Secure with Google</p>", unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         st.stop()

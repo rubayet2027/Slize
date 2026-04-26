@@ -16,49 +16,66 @@ st.set_page_config(
 )
 
 # --- CUSTOM CSS ---
-def local_css():
-    st.markdown("""
+def local_css(mode="Dark"):
+    if mode == "Dark":
+        bg_color = "#0F0F1A"
+        text_color = "#FAFAFA"
+        card_bg = "rgba(30, 30, 46, 0.6)"
+        hero_bg = "rgba(255, 255, 255, 0.03)"
+        border_color = "rgba(255, 255, 255, 0.1)"
+        gradient = "radial-gradient(circle at 50% -20%, #2A1B3D 0%, #0F0F1A 60%)"
+        sub_text = "#B0B0B0"
+    else:
+        bg_color = "#F0F2F6"
+        text_color = "#1F1F1F"
+        card_bg = "rgba(255, 255, 255, 0.9)"
+        hero_bg = "rgba(0, 0, 0, 0.02)"
+        border_color = "rgba(0, 0, 0, 0.1)"
+        gradient = "radial-gradient(circle at 50% -20%, #E0E7FF 0%, #F0F2F6 60%)"
+        sub_text = "#4B5563"
+
+    st.markdown(f"""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
 
-        html, body, [class*="css"] {
+        html, body, [class*="css"] {{
             font-family: 'Inter', sans-serif;
-            background-color: #0F0F1A;
-            color: #FAFAFA;
-        }
+            background-color: {bg_color};
+            color: {text_color};
+        }}
 
-        .stApp {
-            background: radial-gradient(circle at 50% -20%, #2A1B3D 0%, #0F0F1A 60%);
-        }
+        .stApp {{
+            background: {gradient};
+        }}
 
         /* Hero Section */
-        .hero-container {
+        .hero-container {{
             padding: 4rem 2rem;
             text-align: center;
-            background: rgba(255, 255, 255, 0.03);
+            background: {hero_bg};
             border-radius: 20px;
             margin-bottom: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid {border_color};
             backdrop-filter: blur(10px);
-        }
+        }}
 
-        .hero-title {
+        .hero-title {{
             font-size: 4rem;
             font-weight: 800;
             background: linear-gradient(90deg, #BB86FC, #03DAC6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 1rem;
-        }
+        }}
 
-        .hero-subtitle {
+        .hero-subtitle {{
             font-size: 1.5rem;
-            color: #B0B0B0;
+            color: {sub_text};
             margin-bottom: 2rem;
-        }
+        }}
 
         /* Buttons */
-        .stButton>button {
+        .stButton>button {{
             background: linear-gradient(90deg, #6200EE, #BB86FC);
             color: white !important;
             border: none;
@@ -67,29 +84,30 @@ def local_css():
             font-weight: 700;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(98, 0, 238, 0.3);
-        }
+        }}
 
-        .stButton>button:hover {
+        .stButton>button:hover {{
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(98, 0, 238, 0.5);
             background: linear-gradient(90deg, #BB86FC, #6200EE);
-        }
+        }}
 
         /* Cards */
-        .card {
-            background: rgba(30, 30, 46, 0.6);
+        .card {{
+            background: {card_bg};
             padding: 2rem;
             border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid {border_color};
             transition: transform 0.3s ease;
-        }
+            color: {text_color};
+        }}
 
-        .card:hover {
+        .card:hover {{
             border-color: #BB86FC;
-        }
+        }}
 
         /* Badges */
-        .badge {
+        .badge {{
             background: #03DAC6;
             color: #0F0F1A;
             padding: 0.2rem 0.6rem;
@@ -98,35 +116,51 @@ def local_css():
             font-weight: 800;
             vertical-align: middle;
             margin-left: 10px;
-        }
+        }}
 
         /* Result Item */
-        .result-card {
-            background: #1E1E2E;
+        .result-card {{
+            background: {card_bg};
             border-radius: 12px;
             padding: 10px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+            border: 1px solid {border_color};
+        }}
 
         /* Hide Streamlit Branding */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
+        #MainMenu {{visibility: hidden;}}
+        footer {{visibility: hidden;}}
+        header {{visibility: hidden;}}
         
         /* Custom Uploader Styling */
-        .stFileUploader {
+        .stFileUploader {{
             border: 2px dashed rgba(187, 134, 252, 0.3);
             border-radius: 15px;
             padding: 20px;
             background: rgba(187, 134, 252, 0.02);
-        }
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {{
+            .hero-title {{
+                font-size: 2.5rem !important;
+            }}
+            .hero-subtitle {{
+                font-size: 1.1rem !important;
+            }}
+            .hero-container {{
+                padding: 2rem 1rem !important;
+            }}
+            .card {{
+                padding: 1.5rem !important;
+                margin-bottom: 1rem !important;
+            }}
+        }}
         </style>
     """, unsafe_allow_html=True)
 
-local_css()
-
 def main():
+    # --- MODE TOGGLE ---
+    theme_mode = st.sidebar.radio("Appearance", ["Dark", "Light"], horizontal=True)
+    local_css(theme_mode)
     # --- HERO SECTION ---
     st.markdown("""
         <div class="hero-container">

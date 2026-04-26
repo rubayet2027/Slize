@@ -147,7 +147,7 @@ def main():
         # we would need a fallback. But assuming Streamlit 1.56.0+
         pass
 
-    if not st.experimental_user.is_logged_in:
+    if not st.user.is_logged_in:
         # FULL SCREEN LOGIN
         st.markdown('<div style="height: 15vh;"></div>', unsafe_allow_html=True)
         st.markdown('<div class="neon-logo">SLIZE</div>', unsafe_allow_html=True)
@@ -164,7 +164,7 @@ def main():
         st.stop()
 
     # --- LOGGED IN DASHBOARD ---
-    user = st.experimental_user
+    user = st.user
     
     # Navbar
     st.markdown(f"""

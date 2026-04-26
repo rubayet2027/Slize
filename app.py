@@ -8,7 +8,7 @@ from video_utils import get_video_info, process_video_clip
 
 # Page Configuration
 st.set_page_config(
-    page_title="VideoSlicer - Free Video to Shorts Maker",
+    page_title="Slize - Free Video to Shorts Maker",
     page_icon="🎬",
     layout="centered"
 )
@@ -45,7 +45,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def main():
-    st.title("🎬 VideoSlicer")
+    st.title("🎬 Slize")
     st.subheader("Turn long videos into viral Shorts, Reels & TikToks")
 
     with st.expander("ℹ️ How it works"):

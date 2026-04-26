@@ -1,6 +1,6 @@
-# VideoSlicer - Free Video to Shorts Maker
+# Slize - Free Video to Shorts Maker
 
-VideoSlicer is a production-ready Streamlit application designed to help content creators quickly turn long-form videos into viral vertical Shorts, Reels, and TikToks.
+Slize is a production-ready Streamlit application designed to help content creators quickly turn long-form videos into viral vertical Shorts, Reels, and TikToks.
 
 ## Features
 - **Upload**: Support for MP4, MOV, AVI, and MKV.

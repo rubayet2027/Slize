@@ -92,13 +92,16 @@ def main():
     bg_img = get_base64_of_bin_file("assets/slize_hero.png")
     inject_neon_css(bg_img)
 
-    # --- DEFENSIVE AUTH CHECK ---
-    # In some environments, st.user might not have is_logged_in if [auth] is missing
+    # --- ROBUST AUTH CHECK ---
+    if "auth" not in st.secrets:
+        st.error("⚠️ Authentication Configuration Missing")
+        st.info("Please add `[auth]` and `[auth.google]` to your Streamlit Secrets.")
+        st.stop()
+
     is_logged_in = False
     try:
         is_logged_in = st.user.get("is_logged_in", False)
     except Exception:
-        # Fallback if st.user is not yet ready or doesn't support .get()
         if hasattr(st.user, "is_logged_in"):
             is_logged_in = st.user.is_logged_in
 
@@ -113,7 +116,11 @@ def main():
             st.markdown('<div class="login-card">', unsafe_allow_html=True)
             st.markdown("<h3 style='color: #ffffff; margin-bottom: 2rem; font-family: Orbitron;'>ACCESS CREATOR ENGINE</h3>", unsafe_allow_html=True)
             if st.button("CONTINUE WITH GOOGLE"):
-                st.login("google")
+                try:
+                    st.login("google")
+                except Exception as e:
+                    st.error(f"Authentication Error: {str(e)}")
+                    st.warning("Ensure your Redirect URI in Google Console matches your Streamlit Secrets.")
             st.markdown("<p style='margin-top: 2rem; opacity: 0.6; font-size: 0.9rem;'>Free • No Watermark • Secure with Google</p>", unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         st.stop()

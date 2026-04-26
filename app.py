@@ -9,7 +9,7 @@ from video_utils import get_video_info, process_video_clip
 
 # Page Configuration
 st.set_page_config(
-    page_title="ShortSlice - Turn Long Videos into Viral Shorts",
+    page_title="Slize - Turn Long Videos into Viral Shorts",
     page_icon="🎬",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -130,15 +130,15 @@ def main():
     # --- HERO SECTION ---
     st.markdown("""
         <div class="hero-container">
-            <h1 class="hero-title">ShortSlice</h1>
+            <h1 class="hero-title">Slize</h1>
             <p class="hero-subtitle">Turn Long Videos into Viral Shorts, Reels & TikToks in Seconds</p>
             <p style="color: #03DAC6; font-weight: bold;">⚡ Free • No Watermark • High Performance</p>
         </div>
     """, unsafe_allow_html=True)
 
     # Hero Image
-    if os.path.exists("assets/shortslice_hero.png"):
-        st.image("assets/shortslice_hero.png", width='stretch')
+    if os.path.exists("assets/slize_hero.png"):
+        st.image("assets/slize_hero.png", width='stretch')
     else:
         st.image("https://picsum.photos/id/1015/1200/600", width='stretch')
 
@@ -293,7 +293,7 @@ def main():
                     
                     for i, (start, end) in enumerate(st.session_state['clips']):
                         p_status.markdown(f"**Processing Short {i+1}/{len(st.session_state['clips'])}...**")
-                        output_filename = f"ShortSlice_{i+1}.mp4"
+                        output_filename = f"Slize_{i+1}.mp4"
                         output_path = os.path.join(output_dir, output_filename)
                         
                         try:
@@ -325,7 +325,7 @@ def main():
                     st.markdown("### 🎁 Your Viral Content")
                     
                     cols = st.columns(3)
-                    zip_path = os.path.join(output_dir, "ShortSlice_Bundle.zip")
+                    zip_path = os.path.join(output_dir, "Slize_Bundle.zip")
                     
                     with zipfile.ZipFile(zip_path, 'w') as zipf:
                         for idx, file in enumerate(generated_files):
@@ -351,7 +351,7 @@ def main():
                         st.download_button(
                             label="📦 DOWNLOAD ALL AS ZIP",
                             data=f,
-                            file_name="ShortSlice_Bundle.zip",
+                            file_name="Slize_Bundle.zip",
                             mime="application/zip",
                             width='stretch'
                         )
@@ -360,7 +360,7 @@ def main():
     st.markdown("<br><br><br>", unsafe_allow_html=True)
     st.markdown("""
         <div style='text-align: center; color: #666; padding: 2rem; border-top: 1px solid rgba(255,255,255,0.05)'>
-            <p>Built with ❤️ by <b>ShortSlice</b> for the next generation of creators.</p>
+            <p>Built with ❤️ by <b>Slize</b> for the next generation of creators.</p>
             <p style='font-size: 0.8rem;'>Optimized for Streamlit Cloud • Powered by MoviePy 2.x</p>
         </div>
     """, unsafe_allow_html=True)

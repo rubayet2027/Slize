@@ -2,3 +2,4 @@ streamlit
 moviepy
 pandas
 Pillow
+streamlit-authenticator

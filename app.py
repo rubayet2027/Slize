@@ -37,7 +37,6 @@ def inject_neon_css(bg_img_base64):
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;700;800&display=swap');
 
-        /* Global Theme */
         html, body, [class*="css"] {{
             font-family: 'Inter', sans-serif;
             background-color: #050505;
@@ -50,12 +49,9 @@ def inject_neon_css(bg_img_base64):
             background-size: cover;
         }}
 
-        /* Animations */
-        @keyframes neonPulse {{ 0%, 100% {{ box-shadow: 0 0 10px #00f5ff; }} 50% {{ box-shadow: 0 0 30px #00f5ff; }} }}
         @keyframes flicker {{ 0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {{ opacity: 1; text-shadow: 0 0 10px #ec4899; }} 20%, 22%, 24%, 55% {{ opacity: 0.5; text-shadow: none; }} }}
         @keyframes fadeInUp {{ from {{ opacity: 0; transform: translateY(30px); }} to {{ opacity: 1; transform: translateY(0); }} }}
 
-        /* UI Elements */
         .neon-logo {{
             font-family: 'Orbitron', sans-serif;
             font-size: 6rem;
@@ -68,71 +64,27 @@ def inject_neon_css(bg_img_base64):
         }}
 
         .tagline {{
-            text-align: center;
-            font-size: 1.5rem;
-            color: #00f5ff;
-            margin-bottom: 2rem;
-            font-weight: 700;
-            animation: fadeInUp 1s ease-out;
-            letter-spacing: 2px;
+            text-align: center; font-size: 1.5rem; color: #00f5ff; margin-bottom: 2rem; font-weight: 700; animation: fadeInUp 1s ease-out; letter-spacing: 2px;
         }}
 
         .login-card {{
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 245, 255, 0.3);
-            border-radius: 30px;
-            padding: 4rem;
-            text-align: center;
-            backdrop-filter: blur(25px);
-            max-width: 600px;
-            margin: 0 auto;
-            animation: fadeInUp 0.8s ease-out;
-            box-shadow: 0 0 40px rgba(0, 245, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 30px; padding: 4rem; text-align: center; backdrop-filter: blur(25px); max-width: 600px; margin: 0 auto; animation: fadeInUp 0.8s ease-out; box-shadow: 0 0 40px rgba(0, 245, 255, 0.1);
         }}
 
         .stButton>button {{
-            background: linear-gradient(45deg, #6200EE, #ec4899);
-            color: white !important;
-            border: none;
-            padding: 1.2rem 3rem;
-            border-radius: 15px;
-            font-weight: 900;
-            transition: all 0.3s ease;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            background: linear-gradient(45deg, #6200EE, #ec4899); color: white !important; border: none; padding: 1.2rem 3rem; border-radius: 15px; font-weight: 900; transition: all 0.3s ease; width: 100%; text-transform: uppercase; letter-spacing: 1px;
         }}
 
         .stButton>button:hover {{ transform: scale(1.05); box-shadow: 0 0 30px #ec4899; }}
 
-        /* Navbar */
         .navbar {{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 5%;
-            background: rgba(0, 0, 0, 0.85);
-            border-bottom: 2px solid #ec4899;
-            backdrop-filter: blur(20px);
-            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+            display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background: rgba(0, 0, 0, 0.85); border-bottom: 2px solid #ec4899; backdrop-filter: blur(20px); position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
         }}
 
-        .nav-logo-text {{
-            font-family: 'Orbitron', sans-serif;
-            color: #ec4899;
-            font-weight: 900;
-            font-size: 2rem;
-            letter-spacing: 2px;
-        }}
+        .nav-logo-text {{ font-family: 'Orbitron', sans-serif; color: #ec4899; font-weight: 900; font-size: 2rem; letter-spacing: 2px; }}
 
         [data-testid="stSidebar"] {{ display: none; }}
         [data-testid="stSidebarNav"] {{ display: none; }}
-
-        /* Mobile */
-        @media (max-width: 768px) {{
-            .neon-logo {{ font-size: 3rem; letter-spacing: 5px; }}
-            .tagline {{ font-size: 1rem; }}
-        }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -140,14 +92,17 @@ def main():
     bg_img = get_base64_of_bin_file("assets/slize_hero.png")
     inject_neon_css(bg_img)
 
-    # --- GOOGLE AUTH CHECK ---
-    # Note: st.login/logout require configuration in .streamlit/secrets.toml
-    if not st.login:
-        # If the environment doesn't support st.login yet (older versions), 
-        # we would need a fallback. But assuming Streamlit 1.56.0+
-        pass
+    # --- DEFENSIVE AUTH CHECK ---
+    # In some environments, st.user might not have is_logged_in if [auth] is missing
+    is_logged_in = False
+    try:
+        is_logged_in = st.user.get("is_logged_in", False)
+    except Exception:
+        # Fallback if st.user is not yet ready or doesn't support .get()
+        if hasattr(st.user, "is_logged_in"):
+            is_logged_in = st.user.is_logged_in
 
-    if not st.user.is_logged_in:
+    if not is_logged_in:
         # FULL SCREEN LOGIN
         st.markdown('<div style="height: 15vh;"></div>', unsafe_allow_html=True)
         st.markdown('<div class="neon-logo">SLIZE</div>', unsafe_allow_html=True)
@@ -171,8 +126,8 @@ def main():
         <div class="navbar">
             <div class="nav-logo-text">SLIZE</div>
             <div style="display: flex; align-items: center; gap: 20px;">
-                <span style="color: #00f5ff; font-weight: 800; font-family: Orbitron; font-size: 0.9rem;">{user.name.upper()}</span>
-                <img src="{user.picture}" style="width: 40px; border-radius: 50%; border: 2px solid #00f5ff;">
+                <span style="color: #00f5ff; font-weight: 800; font-family: Orbitron; font-size: 0.9rem;">{user.get("name", "CREATOR").upper()}</span>
+                <img src="{user.get("picture", "")}" style="width: 40px; border-radius: 50%; border: 2px solid #00f5ff;">
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -215,7 +170,8 @@ def main():
         if st.session_state.q:
             st.markdown(f"**QUEUE: {len(st.session_state.q)} CLIPS READY**")
             if st.button("🚀 GENERATE VIRAL SHORTS"):
-                user_dir = os.path.join(USER_DATA_DIR, user.email)
+                email = user.get("email", "unknown")
+                user_dir = os.path.join(USER_DATA_DIR, email)
                 if not os.path.exists(user_dir): os.makedirs(user_dir)
                 
                 pbar = st.progress(0)
@@ -223,12 +179,11 @@ def main():
                     fname = f"clip_{int(time.time())}_{i}.mp4"
                     out = os.path.join(user_dir, fname)
                     process_video_clip(video_path, out, s, e, aspect_ratio="9:16", speed=speed, text_overlay=caption)
-                    add_history(user.email, fname, uploaded_file.name)
+                    add_history(email, fname, uploaded_file.name)
                     pbar.progress((i+1)/len(st.session_state.q))
                 
                 st.balloons()
                 st.session_state.q = []
-                st.success("VAULT UPDATED!")
                 st.rerun()
 
     st.markdown('</div>', unsafe_allow_html=True)
@@ -236,23 +191,21 @@ def main():
     # --- VAULT (HISTORY) ---
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown('<div style="background: rgba(255,255,255,0.03); padding: 2rem; border-radius: 30px; border: 1px solid #ec4899; backdrop-filter: blur(10px);">', unsafe_allow_html=True)
-    st.markdown(f"### 📁 {user.name.upper()}'S VAULT")
-    history = get_user_history(user.email)
+    email = user.get("email", "unknown")
+    st.markdown(f"### 📁 {user.get('name', 'CREATOR').upper()}'S VAULT")
+    history = get_user_history(email)
     if history:
         hcols = st.columns(3)
         for i, (fname, ts) in enumerate(history):
             with hcols[i % 3]:
-                fpath = os.path.join(USER_DATA_DIR, user.email, fname)
+                fpath = os.path.join(USER_DATA_DIR, email, fname)
                 if os.path.exists(fpath):
                     st.video(fpath)
                     with open(fpath, "rb") as f: st.download_button("DOWNLOAD", f, file_name=fname, key=f"v_{i}")
-                else:
-                    st.error(f"File {fname} missing")
     else:
         st.info("Your vault is empty. Start slicing to build your viral library!")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Footer
     st.markdown("<div style='text-align: center; color: #444; padding: 4rem; font-family: Orbitron; font-size: 0.8rem; letter-spacing: 2px;'>SLIZE.AI // THE CREATOR'S EDGE</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":

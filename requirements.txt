@@ -3,3 +3,4 @@ moviepy
 pandas
 Pillow
 streamlit-authenticator
+Authlib

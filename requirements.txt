@@ -1,6 +1,7 @@
 streamlit
+supabase
+st-supabase-connection
 moviepy
 pandas
 Pillow
-streamlit-authenticator
 Authlib

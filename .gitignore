@@ -1,0 +1,10 @@
+__pycache__/
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.zip
+.streamlit/
+! .streamlit/config.toml
+temp_*/
+test_imports.py

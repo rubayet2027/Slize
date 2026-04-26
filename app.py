@@ -35,7 +35,7 @@ def get_base64_of_bin_file(bin_file):
 def inject_neon_css(bg_img_base64):
     st.markdown(f"""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700;900&family=Inter:wght@400;700;800&display=swap');
 
         html, body, [class*="css"] {{
             font-family: 'Inter', sans-serif;
@@ -53,13 +53,13 @@ def inject_neon_css(bg_img_base64):
         @keyframes fadeInUp {{ from {{ opacity: 0; transform: translateY(30px); }} to {{ opacity: 1; transform: translateY(0); }} }}
 
         .neon-logo {{
-            font-family: 'Orbitron', sans-serif;
-            font-size: 6rem;
-            font-weight: 900;
+            font-family: 'Bangers', cursive;
+            font-size: 8rem;
+            font-weight: 400;
             text-align: center;
             color: #ffffff;
             animation: flicker 3s infinite alternate;
-            letter-spacing: 15px;
+            letter-spacing: 5px;
             margin-top: 2rem;
         }}
 
@@ -81,7 +81,7 @@ def inject_neon_css(bg_img_base64):
             display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background: rgba(0, 0, 0, 0.85); border-bottom: 2px solid #ec4899; backdrop-filter: blur(20px); position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
         }}
 
-        .nav-logo-text {{ font-family: 'Orbitron', sans-serif; color: #ec4899; font-weight: 900; font-size: 2rem; letter-spacing: 2px; }}
+        .nav-logo-text {{ font-family: 'Bangers', cursive; color: #ec4899; font-weight: 400; font-size: 2.5rem; letter-spacing: 2px; }}
 
         [data-testid="stSidebar"] {{ display: none; }}
         [data-testid="stSidebarNav"] {{ display: none; }}

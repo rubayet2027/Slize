@@ -39,7 +39,22 @@ This app is optimized for Streamlit Cloud.
 3. **Important**: Ensure `packages.txt` is present in the root (it contains `ffmpeg`), which Streamlit uses to install the necessary system dependencies.
 4. Set `.streamlit/config.toml` to increase `maxUploadSize` if you plan to upload videos larger than 200MB.
 
+## 🔑 Google OAuth Setup
+
+To enable the login system, you must configure a Google Cloud project:
+
+1.  **Google Cloud Console**:
+    *   Create a project at [console.cloud.google.com](https://console.cloud.google.com).
+    *   Go to **APIs & Services > Credentials**.
+    *   Create an **OAuth 2.0 Client ID**.
+    *   Add `http://localhost:8501` to **Authorized redirect URIs**.
+2.  **Streamlit Secrets**:
+    *   Open `.streamlit/secrets.toml`.
+    *   Paste your `client_id` and `client_secret`.
+    *   Set a secure `cookie_secret`.
+
 ## Technical Notes
-- Uses **MoviePy** for all video manipulation.
-- Temporary files are handled using `tempfile` and cleaned up by the OS/Streamlit session.
+- Uses **MoviePy 2.x** for all video manipulation.
+- **Native OIDC**: Uses Streamlit's `st.login` and `st.experimental_user`.
+- **Persistent Vault**: User clips are stored in `user_vault/{email}/`.
 - For high-resolution exports (1080x1920), processing time depends on CPU power.

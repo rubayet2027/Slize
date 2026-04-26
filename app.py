@@ -7,15 +7,15 @@ import time
 import base64
 from datetime import timedelta
 from video_utils import get_video_info, process_video_clip
-from auth_utils import init_db, add_user, login_user, add_history, get_user_history
+from auth_utils import init_db, add_history, get_user_history
 
-# Initialize Database
+# Initialize History Database
 init_db()
 
 # Page Configuration
 st.set_page_config(
-    page_title="Slize - Turn Long Videos into Viral Shorts",
-    page_icon="🎬",
+    page_title="Slize - Viral Shorts in Seconds",
+    page_icon="✂️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -26,260 +26,234 @@ if not os.path.exists(USER_DATA_DIR):
     os.makedirs(USER_DATA_DIR)
 
 def get_base64_of_bin_file(bin_file):
-    if not os.path.exists(bin_file):
-        return ""
+    if not os.path.exists(bin_file): return ""
     with open(bin_file, 'rb') as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
-def inject_custom_css(bg_img_base64):
+# --- ADVANCED NEON ANIMATED CSS ---
+def inject_neon_css(bg_img_base64):
     st.markdown(f"""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;700;800&display=swap');
 
+        /* Global Theme */
         html, body, [class*="css"] {{
             font-family: 'Inter', sans-serif;
-            color: #FAFAFA;
+            background-color: #050505;
+            color: #ffffff;
         }}
 
         .stApp {{
-            background: linear-gradient(rgba(15, 15, 26, 0.85), rgba(15, 15, 26, 0.85)), 
+            background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.95)), 
                         url("data:image/png;base64,{bg_img_base64}") no-repeat center center fixed;
             background-size: cover;
         }}
 
+        /* Animations */
+        @keyframes neonPulse {{ 0%, 100% {{ box-shadow: 0 0 10px #00f5ff; }} 50% {{ box-shadow: 0 0 30px #00f5ff; }} }}
+        @keyframes flicker {{ 0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {{ opacity: 1; text-shadow: 0 0 10px #ec4899; }} 20%, 22%, 24%, 55% {{ opacity: 0.5; text-shadow: none; }} }}
+        @keyframes fadeInUp {{ from {{ opacity: 0; transform: translateY(30px); }} to {{ opacity: 1; transform: translateY(0); }} }}
+
+        /* UI Elements */
+        .neon-logo {{
+            font-family: 'Orbitron', sans-serif;
+            font-size: 6rem;
+            font-weight: 900;
+            text-align: center;
+            color: #ffffff;
+            animation: flicker 3s infinite alternate;
+            letter-spacing: 15px;
+            margin-top: 2rem;
+        }}
+
+        .tagline {{
+            text-align: center;
+            font-size: 1.5rem;
+            color: #00f5ff;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            animation: fadeInUp 1s ease-out;
+            letter-spacing: 2px;
+        }}
+
+        .login-card {{
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 30px;
+            padding: 4rem;
+            text-align: center;
+            backdrop-filter: blur(25px);
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
+            box-shadow: 0 0 40px rgba(0, 245, 255, 0.1);
+        }}
+
+        .stButton>button {{
+            background: linear-gradient(45deg, #6200EE, #ec4899);
+            color: white !important;
+            border: none;
+            padding: 1.2rem 3rem;
+            border-radius: 15px;
+            font-weight: 900;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+
+        .stButton>button:hover {{ transform: scale(1.05); box-shadow: 0 0 30px #ec4899; }}
+
+        /* Navbar */
         .navbar {{
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.8rem 5%;
-            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem 5%;
+            background: rgba(0, 0, 0, 0.85);
+            border-bottom: 2px solid #ec4899;
             backdrop-filter: blur(20px);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 9999;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
         }}
 
-        .nav-logo {{
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(90deg, #BB86FC, #03DAC6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }}
-
-        .nav-auth {{
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }}
-
-        .nav-user {{
-            color: #BB86FC;
-            font-weight: 700;
-        }}
-
-        .glass-container {{
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 28px;
-            padding: 3rem;
-            margin: 2rem auto;
-            max-width: 1100px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        }}
-
-        .hero-section {{
-            text-align: center;
-            padding: 8rem 1rem 4rem 1rem;
-        }}
-
-        .hero-title {{
-            font-size: 5.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(180deg, #FFFFFF 0%, #A0A0A0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }}
-
-        .stButton>button {{
-            background: linear-gradient(90deg, #6200EE, #BB86FC);
-            color: white !important;
-            border: none;
-            padding: 0.8rem 2.5rem;
-            border-radius: 14px;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            width: 100%;
+        .nav-logo-text {{
+            font-family: 'Orbitron', sans-serif;
+            color: #ec4899;
+            font-weight: 900;
+            font-size: 2rem;
+            letter-spacing: 2px;
         }}
 
         [data-testid="stSidebar"] {{ display: none; }}
-        
-        .history-card {{
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        [data-testid="stSidebarNav"] {{ display: none; }}
+
+        /* Mobile */
+        @media (max-width: 768px) {{
+            .neon-logo {{ font-size: 3rem; letter-spacing: 5px; }}
+            .tagline {{ font-size: 1rem; }}
         }}
         </style>
     """, unsafe_allow_html=True)
 
 def main():
-    if 'authenticated' not in st.session_state:
-        st.session_state['authenticated'] = False
-    if 'username' not in st.session_state:
-        st.session_state['username'] = None
-    if 'auth_mode' not in st.session_state:
-        st.session_state['auth_mode'] = 'Login'
+    bg_img = get_base64_of_bin_file("assets/slize_hero.png")
+    inject_neon_css(bg_img)
 
-    bg_img_base64 = get_base64_of_bin_file("assets/slize_hero.png")
-    inject_custom_css(bg_img_base64)
+    # --- GOOGLE AUTH CHECK ---
+    # Note: st.login/logout require configuration in .streamlit/secrets.toml
+    if not st.login:
+        # If the environment doesn't support st.login yet (older versions), 
+        # we would need a fallback. But assuming Streamlit 1.56.0+
+        pass
 
-    # --- NAVBAR ---
-    auth_html = ""
-    if st.session_state['authenticated']:
-        auth_html = f'<div class="nav-auth"><span class="nav-user">@{st.session_state["username"]}</span></div>'
-    else:
-        auth_html = '<div class="nav-auth"><span style="opacity: 0.7;">Guest Mode</span></div>'
+    if not st.experimental_user.is_logged_in:
+        # FULL SCREEN LOGIN
+        st.markdown('<div style="height: 15vh;"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="neon-logo">SLIZE</div>', unsafe_allow_html=True)
+        st.markdown('<div class="tagline">SLICE LONG VIDEOS INTO VIRAL SHORTS IN SECONDS 🔥</div>', unsafe_allow_html=True)
+        
+        _, mid, _ = st.columns([1, 1.5, 1])
+        with mid:
+            st.markdown('<div class="login-card">', unsafe_allow_html=True)
+            st.markdown("<h3 style='color: #ffffff; margin-bottom: 2rem; font-family: Orbitron;'>ACCESS CREATOR ENGINE</h3>", unsafe_allow_html=True)
+            if st.button("CONTINUE WITH GOOGLE"):
+                st.login("google")
+            st.markdown("<p style='margin-top: 2rem; opacity: 0.6; font-size: 0.9rem;'>Free • No Watermark • Secure with Google</p>", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        st.stop()
 
+    # --- LOGGED IN DASHBOARD ---
+    user = st.experimental_user
+    
+    # Navbar
     st.markdown(f"""
         <div class="navbar">
-            <a href="/" class="nav-logo">Slize</a>
-            {auth_html}
+            <div class="nav-logo-text">SLIZE</div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <span style="color: #00f5ff; font-weight: 800; font-family: Orbitron; font-size: 0.9rem;">{user.name.upper()}</span>
+                <img src="{user.picture}" style="width: 40px; border-radius: 50%; border: 2px solid #00f5ff;">
+            </div>
         </div>
     """, unsafe_allow_html=True)
 
-    # --- AUTH LOGIC & HERO ---
-    if not st.session_state['authenticated']:
-        st.markdown('<div class="hero-section"><h1 class="hero-title">Slize</h1><p style="font-size: 1.5rem; color: #03DAC6;">Log in to unlock viral potential.</p></div>', unsafe_allow_html=True)
+    st.markdown('<div style="height: 120px;"></div>', unsafe_allow_html=True)
+    
+    # Dashboard Container
+    st.markdown('<div style="background: rgba(255,255,255,0.03); padding: 3rem; border-radius: 30px; border: 1px solid rgba(0,245,255,0.1); backdrop-filter: blur(10px);">', unsafe_allow_html=True)
+    
+    col_out, _ = st.columns([1, 6])
+    if col_out.button("LOGOUT [EXIT]"):
+        st.logout()
+
+    uploaded_file = st.file_uploader("DROP YOUR MASTERPIECE HERE", type=["mp4", "mov", "avi"])
+    
+    if uploaded_file:
+        tfile = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
+        tfile.write(uploaded_file.read())
+        video_path = tfile.name
         
-        _, auth_col, _ = st.columns([1, 1.5, 1])
-        with auth_col:
-            st.markdown('<div class="glass-container">', unsafe_allow_html=True)
-            
-            mode = st.radio("Join the community", ["Login", "Sign Up"], horizontal=True, label_visibility="collapsed")
-            
-            if mode == "Login":
-                user = st.text_input("Username")
-                pw = st.text_input("Password", type="password")
-                if st.button("Access Dashboard"):
-                    if login_user(user, pw):
-                        st.session_state['authenticated'] = True
-                        st.session_state['username'] = user
-                        st.rerun()
-                    else:
-                        st.error("Invalid credentials")
-            else:
-                new_user = st.text_input("Choose Username")
-                new_email = st.text_input("Email Address")
-                new_pw = st.text_input("Create Password", type="password")
-                if st.button("Create Account"):
-                    if add_user(new_user, new_pw, new_email):
-                        st.success("Account created! You can now login.")
-                    else:
-                        st.error("Username already exists")
-            
-            st.markdown('</div>', unsafe_allow_html=True)
-            
+        info = get_video_info(video_path)
+        st.video(video_path)
+        
+        st.markdown("### ⚡ VIRAL ENGINE")
+        col1, col2, col3 = st.columns(3)
+        with col1: ratio = st.selectbox("FORMAT", ["9:16 VERTICAL", "ORIGINAL"])
+        with col2: speed = st.slider("SPEED RAMP", 0.5, 2.0, 1.1)
+        with col3: caption = st.text_input("CAPTIONS", "WAIT FOR IT!")
+
+        if 'q' not in st.session_state: st.session_state.q = []
+        
+        st.markdown("---")
+        c1, c2 = st.columns(2)
+        stt = c1.number_input("START (S)", 0.0, float(info['duration']), 0.0)
+        enn = c2.number_input("END (S)", 0.0, float(info['duration']), min(float(info['duration']), 30.0))
+        if st.button("ADD TO QUEUE"):
+            st.session_state.q.append((stt, enn))
+            st.toast("Clip Added!")
+
+        if st.session_state.q:
+            st.markdown(f"**QUEUE: {len(st.session_state.q)} CLIPS READY**")
+            if st.button("🚀 GENERATE VIRAL SHORTS"):
+                user_dir = os.path.join(USER_DATA_DIR, user.email)
+                if not os.path.exists(user_dir): os.makedirs(user_dir)
+                
+                pbar = st.progress(0)
+                for i, (s, e) in enumerate(st.session_state.q):
+                    fname = f"clip_{int(time.time())}_{i}.mp4"
+                    out = os.path.join(user_dir, fname)
+                    process_video_clip(video_path, out, s, e, aspect_ratio="9:16", speed=speed, text_overlay=caption)
+                    add_history(user.email, fname, uploaded_file.name)
+                    pbar.progress((i+1)/len(st.session_state.q))
+                
+                st.balloons()
+                st.session_state.q = []
+                st.success("VAULT UPDATED!")
+                st.rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- VAULT (HISTORY) ---
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<div style="background: rgba(255,255,255,0.03); padding: 2rem; border-radius: 30px; border: 1px solid #ec4899; backdrop-filter: blur(10px);">', unsafe_allow_html=True)
+    st.markdown(f"### 📁 {user.name.upper()}'S VAULT")
+    history = get_user_history(user.email)
+    if history:
+        hcols = st.columns(3)
+        for i, (fname, ts) in enumerate(history):
+            with hcols[i % 3]:
+                fpath = os.path.join(USER_DATA_DIR, user.email, fname)
+                if os.path.exists(fpath):
+                    st.video(fpath)
+                    with open(fpath, "rb") as f: st.download_button("DOWNLOAD", f, file_name=fname, key=f"v_{i}")
+                else:
+                    st.error(f"File {fname} missing")
     else:
-        # LOGGED IN VIEW
-        st.markdown(f'<div class="hero-section" style="padding-top: 6rem; padding-bottom: 2rem;"><h1 class="hero-title" style="font-size: 3.5rem;">Welcome back, {st.session_state["username"]}</h1></div>', unsafe_allow_html=True)
-
-        # Logout button in a clean spot
-        if st.button("Logout", key="logout_btn", width=100):
-            st.session_state['authenticated'] = False
-            st.session_state['username'] = None
-            st.rerun()
-
-        st.markdown('<div class="glass-container">', unsafe_allow_html=True)
-        
-        # DASHBOARD
-        uploaded_file = st.file_uploader("Drop your video file (MP4/MOV)", type=["mp4", "mov", "avi", "mkv"])
-
-        if uploaded_file:
-            tfile = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
-            tfile.write(uploaded_file.read())
-            video_path = tfile.name
-
-            info = get_video_info(video_path)
-            if "error" in info:
-                st.error("Invalid Video")
-            else:
-                st.video(video_path)
-                
-                st.markdown("---")
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    ratio = st.selectbox("Format", ["9:16 (Vertical)", "Original"])
-                    speed = st.slider("Viral Speed", 0.5, 2.0, 1.0)
-                with col_b:
-                    caption = st.text_input("Caption", "WAIT FOR IT!")
-                    color = st.color_picker("Color", "#FFFFFF")
-
-                # Slicing
-                tabs = st.tabs(["🎯 Manual", "⚖️ Equal", "🧠 Smart"])
-                clips = []
-                
-                with tabs[0]:
-                    s, e = st.columns(2)
-                    start = s.number_input("Start", 0.0, float(info['duration']), 0.0)
-                    end = e.number_input("End", 0.0, float(info['duration']), min(float(info['duration']), 30.0))
-                    if st.button("Add to Queue", width='stretch'):
-                        st.session_state.setdefault('queue', []).append((start, end))
-
-                if st.session_state.get('queue'):
-                    st.write(f"Queue: {len(st.session_state['queue'])} clips")
-                    if st.button("🚀 PROCESS CLIPS", width='stretch'):
-                        user_path = os.path.join(USER_DATA_DIR, st.session_state['username'])
-                        if not os.path.exists(user_path): os.makedirs(user_path)
-                        
-                        pbar = st.progress(0)
-                        for i, (stt, enn) in enumerate(st.session_state['queue']):
-                            fname = f"clip_{int(time.time())}_{i}.mp4"
-                            out_path = os.path.join(user_path, fname)
-                            
-                            process_video_clip(
-                                video_path, out_path, stt, enn,
-                                aspect_ratio="9:16" if "9:16" in ratio else "original",
-                                speed=speed, text_overlay=caption,
-                                text_options={'fontsize': 70, 'color': color, 'position': 'center'}
-                            )
-                            add_history(st.session_state['username'], fname, uploaded_file.name)
-                            pbar.progress((i+1)/len(st.session_state['queue']))
-                        
-                        st.session_state['queue'] = []
-                        st.success("Clips ready in your History!")
-                        st.rerun()
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # --- HISTORY SECTION ---
-        st.markdown('<div class="glass-container">', unsafe_allow_html=True)
-        st.subheader("📁 Your Slize Vault")
-        history = get_user_history(st.session_state['username'])
-        if history:
-            for fname, ts in history:
-                with st.expander(f"🎬 {fname} - {ts}"):
-                    fpath = os.path.join(USER_DATA_DIR, st.session_state['username'], fname)
-                    if os.path.exists(fpath):
-                        st.video(fpath)
-                        with open(fpath, "rb") as f:
-                            st.download_button("Download", f, file_name=fname, key=f"dl_{fname}")
-                    else:
-                        st.error("File not found on server")
-        else:
-            st.info("No clips yet. Start slicing to build your vault!")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.info("Your vault is empty. Start slicing to build your viral library!")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # Footer
-    st.markdown("<div style='text-align: center; color: #666; padding: 4rem;'>© 2026 Slize AI. Individual user data is encrypted and secure.</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: center; color: #444; padding: 4rem; font-family: Orbitron; font-size: 0.8rem; letter-spacing: 2px;'>SLIZE.AI // THE CREATOR'S EDGE</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()

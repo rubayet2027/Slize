@@ -63,12 +63,12 @@ def inject_custom_css():
 
         /* Container Styling */
         [data-testid="stVerticalBlockBorderWrapper"] > div:has(div[data-testid="stVerticalBlock"]) {{
-            background: rgba(255, 255, 255, 0.03) !important;
-            backdrop-filter: blur(25px) !important;
-            border: 1px solid rgba(0, 245, 255, 0.15) !important;
-            border-radius: 30px !important;
-            padding: 2rem !important;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+            background: rgba(255, 255, 255, 0.04) !important;
+            backdrop-filter: blur(60px) !important;
+            border: 1px solid rgba(0, 245, 255, 0.2) !important;
+            border-radius: 40px !important;
+            padding: 3rem !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6) !important;
         }}
 
         .stButton>button {{
@@ -109,14 +109,19 @@ def login_page():
     st.markdown('<div class="neon-logo">SLIZE</div>', unsafe_allow_html=True)
     st.markdown('<p style="text-align: center; color: #00f5ff; font-size: 1.5rem; font-weight: 700; letter-spacing: 2px;">SLICE VIDEOS INTO VIRAL SHORTS 🔥</p>', unsafe_allow_html=True)
     
-    _, mid, _ = st.columns([1, 1.2, 1])
+    _, mid, _ = st.columns([1, 1.4, 1])
     with mid:
         with st.container(border=True):
-            st.markdown("<h2 style='text-align: center; font-family: Orbitron; font-size: 1.5rem;'>CREATOR ACCESS</h2>", unsafe_allow_html=True)
+            st.markdown("<h2 style='text-align: center; font-family: Orbitron; font-size: 1.8rem; letter-spacing: 2px;'>CREATOR ACCESS</h2>", unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("CONTINUE WITH GOOGLE"):
-                st.login("google")
-            st.markdown("<p style='text-align: center; opacity: 0.6; font-size: 0.9rem; margin-top: 1.5rem;'>Free • No Watermark • Secure with Google</p>", unsafe_allow_html=True)
+            
+            # Center the button using inner columns
+            _, btn_col, _ = st.columns([1, 3, 1])
+            with btn_col:
+                if st.button("CONTINUE WITH GOOGLE"):
+                    st.login("google")
+            
+            st.markdown("<p style='text-align: center; opacity: 0.6; font-size: 0.9rem; margin-top: 2rem;'>Free • No Watermark • Secure with Google</p>", unsafe_allow_html=True)
 
 def home_page():
     inject_custom_css()

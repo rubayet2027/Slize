@@ -93,7 +93,7 @@ def inject_custom_css():
 def sync_user_to_db(user):
     if not user: return
     try:
-        data = {"id": user.email, "email": user.email, "name": user.name, "avatar_url": user.picture, "last_login": datetime.now().isoformat()}
+        data = {"id": user.get("email"), "email": user.get("email"), "name": user.get("name"), "avatar_url": user.get("picture"), "last_login": datetime.now().isoformat()}
         supabase.table("users").upsert(data).execute()
     except Exception as e:
         print(f"DB Sync Error: {e}")
@@ -139,15 +139,15 @@ def login_page():
 
 def home_page():
     inject_custom_css()
-    user = st.user
+    user = getattr(st, "experimental_user", None)
     if 'synced' not in st.session_state:
         sync_user_to_db(user)
         st.session_state.synced = True
     
     with st.sidebar:
         st.markdown('<div class="nav-logo">SLIZE</div>', unsafe_allow_html=True)
-        if user.picture: st.image(user.picture, width=100)
-        st.write(f"Hello, **{user.name}**")
+        if user and user.get("picture"): st.image(user.get("picture"), width=100)
+        st.write(f"Hello, **{user.get('name') if user else 'Creator'}**")
         if st.button("LOGOUT"): st.logout()
         st.markdown("---")
 
@@ -159,6 +159,7 @@ def home_page():
         if uploaded_file:
             tfile = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
             tfile.write(uploaded_file.read())
+            tfile.close()
             video_path = tfile.name
             
             info = get_video_info(video_path)
@@ -183,21 +184,27 @@ def home_page():
             if st.session_state.q:
                 st.write(f"**QUEUE: {len(st.session_state.q)} CLIPS READY**")
                 if st.button("🚀 GENERATE VIRAL SHORTS"):
-                    user_dir = os.path.join("user_vault", user.email)
+                    user_dir = os.path.join("user_vault", user.get("email") if user else "local")
                     if not os.path.exists(user_dir): os.makedirs(user_dir)
                     
                     pbar = st.progress(0)
                     for i, (s, e) in enumerate(st.session_state.q):
                         fname = f"short_{int(time.time())}_{i}.mp4"
                         out = os.path.join(user_dir, fname)
-                        process_video_clip(video_path, out, s, e, aspect_ratio="9:16" if "9:16" in ratio else "original", speed=speed, text_overlay=caption)
-                        save_short_to_history(user.email, fname, uploaded_file.name)
+                        process_video_clip(video_path, out, s, e, aspect_ratio="9:16" if "9:16" in ratio else "original", speed=speed, text_overlay=caption, text_options={'fontsize': 70, 'color': 'white', 'position': 'center', 'font': 'Arial-Bold'})
+                        save_short_to_history(user.get("email") if user else "test@test.com", fname, uploaded_file.name)
                         pbar.progress((i+1)/len(st.session_state.q))
                     
                     st.balloons()
                     st.session_state.q = []
                     st.success("VAULT UPDATED!")
                     st.rerun()
+
+user = getattr(st, "experimental_user", None)
+if user and user.get("is_logged_in"):
+    home_page()
+else:
+    login_page()
 
 def history_page():
     inject_custom_css()

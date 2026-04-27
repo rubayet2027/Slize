@@ -45,7 +45,6 @@ def inject_custom_css():
 
         html, body, [class*="css"], h1, h2, h3, h4, h5, h6, p, span, button, label, .stMarkdown, .stText, .stButton, input, select, textarea {{ 
             font-family: 'Bangers', cursive !important; 
-            background-color: #050505; 
             color: #ffffff; 
             letter-spacing: 1px; 
         }}
@@ -121,12 +120,13 @@ def login_page():
             st.markdown("<br>", unsafe_allow_html=True)
             
             # Center the button using inner columns
-            _, btn_col, _ = st.columns([1, 3, 1])
+            _, btn_col, _ = st.columns([0.5, 2, 0.5])
             with btn_col:
                 if st.button("CONTINUE WITH GOOGLE"):
                     st.login("google")
             
-            st.markdown("<p style='text-align: center; opacity: 0.6; font-size: 0.9rem; margin-top: 2rem;'>Free • No Watermark • Secure with Google</p>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align: center; opacity: 0.6; font-size: 0.9rem; margin-top: 1rem;'>Free • No Watermark • Secure with Google</p>", unsafe_allow_html=True)
 
 def home_page():
     inject_custom_css()

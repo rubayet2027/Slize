@@ -14,12 +14,20 @@ st.set_page_config(layout="wide", page_title="Slize", page_icon="✂️")
 
 # --- SUPABASE CONNECTION ---
 @st.cache_resource
-def get_supabase() -> Client:
-    url = st.secrets["supabase"]["url"]
-    key = st.secrets["supabase"]["key"]
-    return create_client(url, key)
+def get_supabase():
+    try:
+        url = st.secrets["supabase"]["url"]
+        key = st.secrets["supabase"]["key"]
+        return create_client(url, key)
+    except Exception:
+        return None
 
 supabase = get_supabase()
+
+if supabase is None:
+    st.error("⚠️ Supabase Configuration Missing")
+    st.info("Please go to **App Settings > Secrets** on Streamlit Cloud and add your `[supabase]` section.")
+    st.stop()
 
 # --- CUSTOM CSS (NEON ANIMATIONS) ---
 def inject_custom_css():

@@ -43,7 +43,12 @@ def inject_custom_css():
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;900&family=Inter:wght@400;700&display=swap');
 
-        html, body, [class*="css"] {{ font-family: 'Bangers', cursive; background-color: #050505; color: #ffffff; letter-spacing: 1px; }}
+        html, body, [class*="css"], h1, h2, h3, h4, h5, h6, p, span, button, label, .stMarkdown, .stText, .stButton, input, select, textarea {{ 
+            font-family: 'Bangers', cursive !important; 
+            background-color: #050505; 
+            color: #ffffff; 
+            letter-spacing: 1px; 
+        }}
         
         .stApp {{
             background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)), 

@@ -73,6 +73,7 @@ def inject_custom_css():
 # --- DB HELPERS ---
 def sync_user_to_db(user):
     """Sync Google user info to Supabase users table."""
+    if not user: return
     try:
         data = {
             "id": user.email,
@@ -83,7 +84,8 @@ def sync_user_to_db(user):
         }
         supabase.table("users").upsert(data).execute()
     except Exception as e:
-        st.error(f"DB Sync Error: {e}")
+        # Log error but don't crash the app
+        print(f"DB Sync Error: {e}")
 
 def save_short_to_history(email, clip_name, original_name):
     """Save generation record to Supabase."""
@@ -97,6 +99,7 @@ def save_short_to_history(email, clip_name, original_name):
         supabase.table("user_shorts").insert(data).execute()
     except Exception as e:
         st.error(f"History Save Error: {e}")
+        print(f"History Error: {e}")
 
 # --- PAGE FUNCTIONS ---
 
@@ -118,7 +121,11 @@ def login_page():
 def home_page():
     inject_custom_css()
     user = st.user
-    sync_user_to_db(user)
+    
+    # Sync in background, don't block UI
+    if 'synced' not in st.session_state:
+        sync_user_to_db(user)
+        st.session_state.synced = True
     
     # Sidebar Profile
     with st.sidebar:

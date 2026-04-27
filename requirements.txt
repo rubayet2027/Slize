@@ -1,7 +1,6 @@
-streamlit
-supabase
-st-supabase-connection
-moviepy
-pandas
-Pillow
-Authlib
+streamlit>=1.42
+supabase>=2.12
+moviepy>=2.1
+Pillow>=10.0
+Authlib>=1.3
+imageio-ffmpeg>=0.5

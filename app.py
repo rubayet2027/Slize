@@ -118,14 +118,20 @@ def login_page():
         with st.container(border=True):
             st.markdown("<h2 style='text-align: center; font-family: Orbitron; font-size: 1.8rem; letter-spacing: 2px;'>CREATOR ACCESS</h2>", unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
-            
+            # Google Logo
+            st.markdown("""
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Reference_Icon.svg" width="40">
+                </div>
+            """, unsafe_allow_html=True)
+
             # Dual Buttons: Login and Sign Up
             l_col, r_col = st.columns(2)
             with l_col:
-                if st.button("🔐 LOGIN"):
+                if st.button("LOGIN"):
                     st.login("google")
             with r_col:
-                if st.button("🚀 SIGN UP"):
+                if st.button("SIGN UP"):
                     st.login("google")
             
             st.markdown("<br>", unsafe_allow_html=True)
